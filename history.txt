@@ -1,0 +1,50 @@
+#V2
+(contract-call? .core construct .edp000-bootstrap)
+(contract-call? .proposal-submission propose .edp001-dev-fund (+ block-height u144))
+(contract-call? .proposal-submission propose .edp001-dev-fund Red-Funding Red-Funding-Description)
+(contract-call? .proposal-submission propose .edp001-dev-fund "Red-Funding" " Red-Funding-Description" )
+(contract-call? .proposal-submission propose .edp001-dev-fund "Red-Funding" "Red-Funding-Description" )
+(contract-call? .proposal-submission propose .edp001-dev-fund "Red-Funding" "Red-Funding-Desciption" )
+(contract-call? .core construct .edp000-bootstrap)
+(contract-call? .proposal-submission propose .edp001-dev-fund "Red-Funding" "Red-Funding-Desciption" )
+(contract-call? .proposal-submission propose .edp001-dev-fund "Red-Funding" "Hello" )
+(contract-call? .proposal-submission propose .edp001-dev-fund "Red-Funding" "Hello-code-red" )
+(contract-call? .proposal-submission propose .edp001-dev-fund "Red-Funding" "Hello" )
+(contract-call? .core construct .edp000-bootstrap)
+(contract-call? .proposal-submission propose .edp001-dev-fund "Hello-title" "Hello-des" )
+(contract-call? .proposal-submission propose .edp001-dev-fund "Hello-title" "你好" )
+(contract-call? .proposal-submission propose .edp001-dev-fund "Hello-title" "hello" )
+(contract-call? .proposal-submission propose .edp001-dev-fund "Hello-title" hello )
+(contract-call? .proposal-submission propose .edp001-dev-fund "Hello-title" 'hello' )
+(contract-call? .proposal-submission propose .edp001-dev-fund "Hello-title" "hello" )
+(contract-call? .proposal-submission propose .edp001-dev-fund "hellotitle" "hello" )
+(contract-call? .proposal-submission propose .edp001-dev-fund "hellotitle" "12345678" )
+(contract-call? .core construct .edp000-bootstrap)
+(contract-call? .proposal-submission propose .edp001-dev-fund "Ironman" "Batman" )
+(contract-call? .proposal-submission propose .edp001-dev-fund "Red-Funding" " Red-Funding-Description" )
+(contract-call? .core construct .edp000-bootstrap)
+(contract-call? .proposal-submission propose .edp001-dev-fund "Ironman" "Batman" )
+(contract-call? .core construct .edp000-bootstrap)
+(contract-call? .proposal-submission propose .edp001-dev-fund "Hello-title" "Hello-description")
+::advance_chain_tip 144
+(contract-call? .proposal-voting get-proposal-data .edp001-dev-fund)
+(contract-call? .proposal-voting vote u100 true .edp001-dev-fund)
+(contract-call? .proposal-voting get-proposal-data .edp001-dev-fund)
+::get_assests_maps
+::get_assets_maps
+::advance_chain_tip 1440
+(contract-call? .proposal-voting conclude .edp001-dev-fund)
+::get_assets_maps
+(contract-call? .core is-extension 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
+(contract-call? .core is-extension .edp001-dev-fund)
+(contract-call? .core is-extension .ede005-dev-fund)
+(contract-call? .core is-extension .membership-token)
+(contract-call? .core construct .edp000-bootstrap)
+(contract-call? .proposal-submission propose .edp001-dev-fund "Proposal-title" "Proposal-description")
+::advance_chain_tip 144
+(contract-call? .proposal-voting get-proposal-data .edp001-dev-fund)
+(contract-call? .proposal-voting vote u100 true .edp001-dev-fund)
+(contract-call? .proposal-voting get-proposal-data .edp001-dev-fund)
+::advance_chain_tip 1440
+(contract-call? .proposal-voting conclude .edp001-dev-fund)
+::get_assets_maps

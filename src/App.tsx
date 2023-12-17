@@ -115,7 +115,7 @@ function App(): ReactElement {
   };
 
   const executeBootstrap = async () => {
-    const senderAddress = 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM';
+    const senderAddress = 'ST3NN4DN22G3DWRFXB94PS3TXHY8CBA6H6JSD0RJD';
     const contractAddress = 'ST3NN4DN22G3DWRFXB94PS3TXHY8CBA6H6JSD0RJD';
     const contractName = 'proposal-voting';
     const functionName = 'get-proposal-data';

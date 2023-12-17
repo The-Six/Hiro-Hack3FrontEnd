@@ -1,0 +1,24 @@
+{
+  "name": "Get Proposal Data",
+  "chain": "stacks",
+  "version": 1,
+  "networks": {
+    "testnet": {
+      "if_this": {
+        "scope": "contract_call",
+        "method": "get-proposal-data",
+        "contract_identifier": "ST3NN4DN22G3DWRFXB94PS3TXHY8CBA6H6JSD0RJD.proposal-voting"
+      },
+      "end_block": null,
+      "then_that": {
+        "http_post": {
+          "url": "https://hirohack3marcoijazcodetech.loca.lt/api/events",
+          "authorization_header": ""
+        }
+      },
+      "start_block": 138463,
+      "decode_clarity_values": true,
+      "expire_after_occurrence": null
+    }
+  }
+}

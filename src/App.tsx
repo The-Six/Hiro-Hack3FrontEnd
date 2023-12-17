@@ -1,11 +1,13 @@
 import React, { ReactElement, useState } from 'react';
-import { StacksMainnet } from '@stacks/network';
+import { StacksMainnet, StacksTestnet } from '@stacks/network';
 import {
   callReadOnlyFunction,
   getAddressFromPublicKey,
   uintCV,
   cvToValue,
-  standardPrincipalCV
+  standardPrincipalCV,
+  noneCV,
+  contractPrincipalCV
 } from '@stacks/transactions';
 import {
   AppConfig,
@@ -32,7 +34,7 @@ function App(): ReactElement {
   const userSession = new UserSession({ appConfig });
 
   const message = 'Hello, Hiro Hacks!';
-  const network = new StacksMainnet();
+  const network = new StacksTestnet();
 
   // Define your authentication options here
   const authOptions = {
@@ -44,7 +46,7 @@ function App(): ReactElement {
     onFinish: (data: FinishedAuthData) => {
       // Handle successful authentication here
       let userData = data.userSession.loadUserData();
-      setAddress(userData.profile.stxAddress.mainnet); // or .testnet for testnet
+      setAddress(userData.profile.stxAddress.testnet); // or .testnet for testnet
     },
     onCancel: () => {
       // Handle authentication cancellation here
@@ -114,14 +116,15 @@ function App(): ReactElement {
 
   const executeBootstrap = async () => {
     const senderAddress = 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM';
-    const contractAddress = 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM';
-    const contractName = 'core';
-    const functionName = 'construct';
-    const bootstrap =
-      'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.edp000-bootstrap';
-    const bootstrap2 = 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM';
+    const contractAddress = 'ST3NN4DN22G3DWRFXB94PS3TXHY8CBA6H6JSD0RJD';
+    const contractName = 'proposal-voting';
+    const functionName = 'get-proposal-data';
+    const bootstrap = 'ST3NN4DN22G3DWRFXB94PS3TXHY8CBA6H6JSD0RJD';
+    //const bootstrap2 =
+    //  'ST3NN4DN22G3DWRFXB94PS3TXHY8CBA6H6JSD0RJD.edp001-dev-fund';
+    const functionArgs = [contractPrincipalCV(bootstrap, 'edp001-dev-fund')];
 
-    const functionArgs = [standardPrincipalCV(bootstrap2)];
+    //const functionArgs = [standardPrincipalCV(bootstrap2)];
     // const functionArgs = [uintCV(10)];
 
     try {

@@ -20,6 +20,7 @@ import { verifyMessageSignatureRsv } from '@stacks/encryption';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import ProposalComponent from './components/ui/test';
 import { ExternalLink } from './external-link';
 import { ArrowRight } from 'lucide-react';
 import { truncateAddress } from './lib/utils';
@@ -310,7 +311,8 @@ function App(): ReactElement {
         </div>
         {userSession.isUserSignedIn() ? (
           <div className="mt-4 rounded-lg border bg-amber-400 p-8">
-            <h1 className="text-xl underline text-center">Grants Program</h1>
+            <ProposalComponent />
+            {/* <h1 className="text-xl underline text-center">Grants Program</h1>
             <h3 className="mt-4 text-lg">Instructions to run the program: </h3>
             <p className="mt-2">
               1. Go to terminal and open the clarinet console
@@ -369,7 +371,7 @@ function App(): ReactElement {
               onClick={() => executeBootstrap()}
             >
               Execute Bootstrap
-            </button>
+            </button> */}
             {/* <br />
             <button
               className="mt-4 px-2 border hover:bg-violet-600 hover:text-white"

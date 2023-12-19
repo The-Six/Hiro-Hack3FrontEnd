@@ -303,7 +303,8 @@ function App(): ReactElement {
       );
       const data = await response.json();
       // Update state with the list of proposals, including the newly created one
-      setProposals(data.data);
+      // reverse() will let the latest proposal be the first one in the list
+      setProposals(data.data.reverse());
       if (Object.keys(currentProposal).length === 0) {
         if (data.data.length > 0) {
           setCurrentProposal(data.data[data.data.length - 1]);

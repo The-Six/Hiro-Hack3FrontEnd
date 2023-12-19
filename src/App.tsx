@@ -561,7 +561,7 @@ function App(): ReactElement {
             </button>
             {onChainGetProposalData ? (
               <div>
-                <p>{onChainGetProposalData.type}</p>
+                <p>Type: {onChainGetProposalData.type}</p>
                 <p className="mt-4">
                   More info can be found in Chrome console.
                 </p>

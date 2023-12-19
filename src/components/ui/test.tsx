@@ -11,7 +11,7 @@ const ProposalComponent: React.FC = () => {
   const handleCreateProposal = async () => {
     try {
       const response = await fetch(
-        'https://hirohack3marcoijazcodetech.loca.lt/api/events',
+        'https://hirohack3marcoijazcodetech.loca.lt/api/submitProposal',
         {
           method: 'POST',
           headers: {
@@ -27,12 +27,12 @@ const ProposalComponent: React.FC = () => {
                     },
                     operations: [
                       {
-                        walletId: 110013,
+                        walletId: 240025,
                         proposalTitle: title,
                         proposalDescription: description,
                         voteForNum: 0,
                         voteAgainstNum: 0,
-                        voteForHistory: [110013, 120020],
+                        voteForHistory: [240025, 120020],
                         voteAgainstHistory: []
                       }
                     ]

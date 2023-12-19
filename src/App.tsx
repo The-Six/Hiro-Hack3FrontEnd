@@ -1,5 +1,5 @@
-import React, { ReactElement, useState } from 'react';
-import { StacksMainnet, StacksTestnet } from '@stacks/network';
+import React, { ReactElement, useState, useEffect } from 'react';
+import { StacksTestnet } from '@stacks/network';
 import {
   callReadOnlyFunction,
   getAddressFromPublicKey,
@@ -20,7 +20,7 @@ import { verifyMessageSignatureRsv } from '@stacks/encryption';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import ProposalComponent from './components/ui/test';
+// import ProposalComponent from './components/ui/test';
 import { ExternalLink } from './external-link';
 import { ArrowRight } from 'lucide-react';
 import { truncateAddress } from './lib/utils';
@@ -29,6 +29,19 @@ function App(): ReactElement {
   const [address, setAddress] = useState('');
   const [isSignatureVerified, setIsSignatureVerified] = useState(false);
   const [hasFetchedReadOnly, setHasFetchedReadOnly] = useState(false);
+  const [title, setTitle] = useState('');
+  const [description, setDescription] = useState('');
+  const [voteFor, setVoteFor] = useState(0);
+  const [voteAgainst, setVoteAgainst] = useState(0);
+  const [proposals, setProposals] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [currentProposal, setCurrentProposal] = useState({});
+  const [currentTitle, setCurrentTitle] = useState('');
+  const [currentDescription, setCurrentDescription] = useState('');
+  const [currentVoteForHistory, setCurrentVoteForHistory] = useState([]);
+  const [currentVoteAgainstHistory, setCurrentVoteAgainstHistory] = useState(
+    []
+  );
 
   // Initialize your app configuration and user session here
   const appConfig = new AppConfig(['store_write', 'publish_data']);
@@ -54,6 +67,10 @@ function App(): ReactElement {
     },
     redirectTo: '/'
   };
+
+  useEffect(() => {
+    getAllProposalData();
+  }, []);
 
   const connectWallet = () => {
     showConnect(authOptions);
@@ -115,7 +132,158 @@ function App(): ReactElement {
     }
   };
 
-  const executeBootstrap = async () => {
+  const handleCreateProposal = async () => {
+    try {
+      const response = await fetch(
+        'https://hirohack3marcoijazcodetech.loca.lt/api/submitProposal',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            apply: [
+              {
+                transactions: [
+                  {
+                    metadata: {
+                      receipt: '...'
+                    },
+                    operations: [
+                      {
+                        walletId: address,
+                        proposalTitle: title,
+                        proposalDescription: description,
+                        voteForNum: 0,
+                        voteAgainstNum: 0,
+                        voteForHistory: [],
+                        voteAgainstHistory: []
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          })
+        }
+      );
+
+      const data = await response.json();
+      // Update state or handle response data as needed
+      console.log('Proposal created:', data);
+
+      // It will set the current proposal without id from the Supabase database
+      setCurrentProposal({
+        walletId: address,
+        proposalTitle: title,
+        proposalDescription: description,
+        voteForNum: 0,
+        voteAgainstNum: 0,
+        voteForHistory: [],
+        voteAgainstHistory: []
+      });
+      setCurrentTitle(title);
+      setCurrentDescription(description);
+      setVoteFor(0);
+      setVoteAgainst(0);
+      setCurrentVoteForHistory([]);
+      setCurrentVoteAgainstHistory([]);
+
+      // Refresh the proposal history
+      getAllProposalData();
+
+      // Now you can enable the voteFor and voteAgainst inputs
+    } catch (error) {
+      console.error('Error creating proposal:', error);
+    }
+  };
+
+  const handleUpdateVoteFor = async () => {
+    // Similar to handleCreateProposal, update the proposal with voteFor and voteAgainst
+    // Use the current proposal data and update the voteForNum and voteAgainstNum fields
+    // Update state accordingly
+
+    try {
+      const response = await fetch(
+        'https://hirohack3marcoijazcodetech.loca.lt/api/voteFor',
+        {
+          method: 'POST', // or 'PATCH' depending on your API
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            title: currentTitle,
+            description: currentDescription,
+            updatedNumVoteFor: voteFor + 1,
+            updatedVoteForHistory: [...currentVoteForHistory, address]
+          })
+        }
+      );
+
+      const data = await response.json();
+      // Update state or handle response data as needed
+      console.log('Votes updated:', data);
+      setVoteFor(voteFor + 1);
+      setCurrentVoteForHistory([...currentVoteForHistory, address]);
+      console.log('Array: ' + [...currentVoteForHistory, address]);
+    } catch (error) {
+      console.error('Error updating votes:', error);
+    }
+  };
+
+  const handleConcludeProposal = async () => {
+    try {
+      setIsLoading(true);
+      // Fetch all proposals
+      const response = await fetch(
+        'https://hirohack3marcoijazcodetech.loca.lt/api/events'
+      );
+      const data = await response.json();
+      // Update state with the list of proposals, including the newly created one
+      setProposals(data);
+    } catch (error) {
+      console.error('Error fetching proposals:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const getAllProposalData = async () => {
+    try {
+      setIsLoading(true);
+      // Fetch all proposals
+      const response = await fetch(
+        'https://hirohack3marcoijazcodetech.loca.lt/api/getAllProposal'
+      );
+      const data = await response.json();
+      // Update state with the list of proposals, including the newly created one
+      setProposals(data.data);
+      if (Object.keys(currentProposal).length === 0) {
+        if (data.data.length > 0) {
+          setCurrentProposal(data.data[data.data.length - 1]);
+          setCurrentTitle(data.data[data.data.length - 1].proposaltitle);
+          setCurrentDescription(
+            data.data[data.data.length - 1].proposaldescription
+          );
+          setVoteFor(data.data[data.data.length - 1].votefornum);
+          setVoteAgainst(data.data[data.data.length - 1].voteagainstnum);
+          setCurrentVoteForHistory(
+            data.data[data.data.length - 1].voteforhistory
+          );
+          setCurrentVoteAgainstHistory(
+            data.data[data.data.length - 1].voteagainsthistory
+          );
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching proposals:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // This function interacts with the testnet
+  const getProposalData = async () => {
     const senderAddress = 'ST3NN4DN22G3DWRFXB94PS3TXHY8CBA6H6JSD0RJD';
     const contractAddress = 'ST3NN4DN22G3DWRFXB94PS3TXHY8CBA6H6JSD0RJD';
     const contractName = 'proposal-voting';
@@ -145,82 +313,6 @@ function App(): ReactElement {
       console.error('Error fetching read-only function:', error);
     }
   };
-
-  // const proposeContract = async () => {
-  //   const senderAddress = 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM';
-  //   const contractAddress = 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM';
-  //   const contractName = 'proposal-submission';
-  //   const functionName = 'propose';
-  //   const bootstrap =
-  //     'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.edp001-dev-fund';
-
-  //   // const functionArgs = [
-  //   //   standardPrincipalCV(bootstrap),
-  //   //   'ProjectTitle',
-  //   //   'ProjectDescription'
-  //   // ];
-  //   const functionArgs = [uintCV(10)];
-
-  //   try {
-  //     const result = await callReadOnlyFunction({
-  //       network,
-  //       contractAddress,
-  //       contractName,
-  //       functionName,
-  //       functionArgs,
-  //       senderAddress
-  //     });
-  //     setHasFetchedReadOnly(true);
-  //     console.log('Bootstrap Button clicked');
-  //     console.log(cvToValue(result));
-  //     // console.log(result);
-  //   } catch (error) {
-  //     console.error('Error fetching read-only function:', error);
-  //   }
-  // };
-
-  // const testIsExtension = async () => {
-  //   // Define your contract details here
-  //   // const senderAddress = "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM";
-
-  //   // const contractAddress = 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM';
-  //   // const contractName = 'keys';
-  //   // const functionName = 'is-keyholder';
-
-  //   // const functionArgs = [standardPrincipalCV(senderAddress)];
-
-  //   // const contractAddress = 'SP000000000000000000002Q6VF78';
-  //   // const contractName = 'pox-3';
-  //   // const functionName = 'is-pox-active';
-  //   // const functionArgs = [uintCV(10)];
-
-  //   const senderAddress = 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM';
-  //   const contractAddress = 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM';
-  //   const contractName = 'core';
-  //   const functionName = 'is-extension';
-  //   const extensionAddress =
-  //     'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.membership-token';
-
-  //   // const functionArgs = [standardPrincipalCV(extensionAddress)];
-  //   const functionArgs = [uintCV(10)];
-
-  //   try {
-  //     const result = await callReadOnlyFunction({
-  //       network,
-  //       contractAddress,
-  //       contractName,
-  //       functionName,
-  //       functionArgs,
-  //       senderAddress
-  //     });
-  //     setHasFetchedReadOnly(true);
-  //     console.log('Button clicked');
-  //     console.log(cvToValue(result));
-  //     // console.log(result);
-  //   } catch (error) {
-  //     console.error('Error fetching read-only function:', error);
-  //   }
-  // };
 
   return (
     <div className="flex items-center justify-center min-h-screen">
@@ -311,81 +403,100 @@ function App(): ReactElement {
         </div>
         {userSession.isUserSignedIn() ? (
           <div className="mt-4 rounded-lg border bg-amber-400 p-8">
-            <ProposalComponent />
-            {/* <h1 className="text-xl underline text-center">Grants Program</h1>
-            <h3 className="mt-4 text-lg">Instructions to run the program: </h3>
-            <p className="mt-2">
-              1. Go to terminal and open the clarinet console
-            </p>
-            <p className="text-white bg-black py-2 pl-4">clarinet console</p>
-            <p className="mt-2">
-              2. Execute the bootstrap proposal by inputting
-            </p>
-            <p className="text-white bg-black py-2 pl-4">
-              (contract-call? .core construct .edp000-bootstrap)
-            </p>
-            <p className="mt-2">3. Submit the edp001-dev-fund proposal</p>
-            <p className="text-white bg-black py-2 pl-4">
-              (contract-call? .proposal-submission propose .edp001-dev-fund
-              "Proposal-title" "Proposal-description")
-            </p>
-            <p className="mt-2">4. Advance the chain 144 blocks</p>
-            <p className="text-white bg-black py-2 pl-4">
-              ::advance_chain_tip 144
-            </p>
-            <p className="mt-2">
-              5. Check the current proposal data before voting
-            </p>
-            <p className="text-white bg-black py-2 pl-4">
-              (contract-call? .proposal-voting get-proposal-data
-              .edp001-dev-fund)
-            </p>
-            <p className="mt-2">6. Vote Yes with 100 tokens</p>
-            <p className="text-white bg-black py-2 pl-4">
-              (contract-call? .proposal-voting vote u100 true .edp001-dev-fund)
-            </p>
-            <p className="mt-2">7. Check the updated proposal data</p>
-            <p className="text-white bg-black py-2 pl-4">
-              (contract-call? .proposal-voting get-proposal-data
-              .edp001-dev-fund)
-            </p>
-            <p className="mt-2">8. Advance the chain tip</p>
-            <p className="text-white bg-black py-2 pl-4">
-              ::advance_chain_tip 1440
-            </p>
-            <p className="mt-2">9. Conclude the proposal vote</p>
-            <p className="text-white bg-black py-2 pl-4">
-              (contract-call? .proposal-voting conclude .edp001-dev-fund)
-            </p>
-            <p className="mt-2">10. Check the ede005-dev-fund contract now</p>
-            <p className="text-white bg-black py-2 pl-4">::get_assets_maps</p>
+            {/* <ProposalComponent /> */}
+            <div>
+              <h1 className="text-xl underline text-center">
+                Custom Blockchain API Front-End
+              </h1>
+              <div className="mt-6">
+                <label>Title:</label>
+                <br />
+                <input
+                  type="text"
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                />
+              </div>
+              <div>
+                <label>Description:</label>
+                <br />
+                <input
+                  type="text"
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                />
+              </div>
+              <div>
+                <button
+                  className="mt-2 px-2 border bg-yellow-200 hover:bg-violet-600 hover:text-white"
+                  onClick={handleCreateProposal}
+                >
+                  Submit Proposal
+                </button>
+              </div>
+              <div className="mt-1">
+                {/* Display and enable voteFor and voteAgainst inputs here */}
+              </div>
+              <p>The current proposal selected: {currentTitle}</p>
+              <p>The Vote-For Number: {voteFor}</p>
+              <div>
+                <button
+                  className="mt-2 px-2 border bg-yellow-200 hover:bg-violet-600 hover:text-white"
+                  onClick={handleUpdateVoteFor}
+                >
+                  Submit Votes
+                </button>
+              </div>
+              <div>
+                <button
+                  className="mt-2 px-2 border bg-yellow-200 hover:bg-violet-600 hover:text-white"
+                  onClick={handleConcludeProposal}
+                  disabled={isLoading}
+                >
+                  Conclude Proposal
+                </button>
+              </div>
+              <button
+                className="mt-4 px-2 border bg-yellow-200 hover:bg-violet-600 hover:text-white"
+                onClick={() => getAllProposalData()}
+              >
+                Refresh All Proposal History
+              </button>
+              <div>
+                <ul>
+                  {proposals.map((proposal) => (
+                    <li key={proposal.id}>
+                      <strong>Wallet ID:</strong> {proposal.walletid}
+                      <br />
+                      <strong>Title:</strong> {proposal.proposaltitle}
+                      <br />
+                      <strong>Description:</strong>{' '}
+                      {proposal.proposaldescription}
+                      <br />
+                      <strong>Vote For:</strong> {proposal.votefornum}
+                      <br />
+                      <strong>Vote Against:</strong> {proposal.voteagainstnum}
+                      <br />
+                      <strong>Vote For History:</strong>{' '}
+                      {proposal.voteforhistory.join(', ')}
+                      <br />
+                      <strong>Vote Against History:</strong>{' '}
+                      {proposal.voteagainsthistory.join(', ')}
+                      <hr />
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
             <p className="mt-4">
-              Notes: Our contracts are not deployed on the blockchain and this
-              is why we can only test the functionality locally through the
-              clarinet console and not through a dynamic frontend. A button is
-              created to validate this. Please open the Chrome Console to view
-              the error message.
+              Notes: The following buttons will interact with the testnet.
             </p>
             <button
               className="mt-4 px-2 border bg-yellow-200 hover:bg-violet-600 hover:text-white"
-              onClick={() => executeBootstrap()}
+              onClick={() => getProposalData()}
             >
-              Execute Bootstrap
-            </button> */}
-            {/* <br />
-            <button
-              className="mt-4 px-2 border hover:bg-violet-600 hover:text-white"
-              onClick={() => proposeContract()}
-            >
-              Propose Contract
+              Get Proposal Data (On-Chain)
             </button>
-            <br />
-            <button
-              className="mt-4 px-2 border hover:bg-violet-600 hover:text-white"
-              onClick={() => testIsExtension()}
-            >
-              testIsExtension
-            </button> */}
           </div>
         ) : null}
       </div>

@@ -43,6 +43,7 @@ function App(): ReactElement {
     []
   );
   const [concludeText, setConcludeText] = useState('');
+  const [onChainGetProposalData, setOnChainGetProposalData] = useState('');
 
   // Initialize your app configuration and user session here
   const appConfig = new AppConfig(['store_write', 'publish_data']);
@@ -230,6 +231,9 @@ function App(): ReactElement {
       setVoteFor(voteFor + 1);
       setCurrentVoteForHistory([...currentVoteForHistory, address]);
       console.log('Array: ' + [...currentVoteForHistory, address]);
+
+      // Refresh the proposal history
+      getAllProposalData();
     } catch (error) {
       console.error('Error updating votes:', error);
     }
@@ -263,6 +267,9 @@ function App(): ReactElement {
       setVoteAgainst(voteAgainst + 1);
       setCurrentVoteAgainstHistory([...currentVoteAgainstHistory, address]);
       console.log('Array: ' + [...currentVoteAgainstHistory, address]);
+
+      // Refresh the proposal history
+      getAllProposalData();
     } catch (error) {
       console.error('Error updating votes:', error);
     }
@@ -285,11 +292,11 @@ function App(): ReactElement {
     // }
     if (voteFor > voteAgainst) {
       setConcludeText(
-        'The number of vote-for is greater than vote-against, hence the proposal can be granted and 3000 membership tokens can be assigned to the proposal.'
+        'The number of vote-for is greater than the vote-against, hence the proposal can be granted and 3000 membership tokens can be assigned to the proposal.'
       );
     } else {
       setConcludeText(
-        'The number of vote-for is not enough for the proposal to have the grants.'
+        'The number of vote-for is not enough for the proposal to have the grant.'
       );
     }
   };
@@ -304,22 +311,17 @@ function App(): ReactElement {
       const data = await response.json();
       // Update state with the list of proposals, including the newly created one
       // reverse() will let the latest proposal be the first one in the list
-      setProposals(data.data.reverse());
+      const reversedData = data.data.reverse();
+      setProposals(reversedData);
       if (Object.keys(currentProposal).length === 0) {
         if (data.data.length > 0) {
-          setCurrentProposal(data.data[data.data.length - 1]);
-          setCurrentTitle(data.data[data.data.length - 1].proposaltitle);
-          setCurrentDescription(
-            data.data[data.data.length - 1].proposaldescription
-          );
-          setVoteFor(data.data[data.data.length - 1].votefornum);
-          setVoteAgainst(data.data[data.data.length - 1].voteagainstnum);
-          setCurrentVoteForHistory(
-            data.data[data.data.length - 1].voteforhistory
-          );
-          setCurrentVoteAgainstHistory(
-            data.data[data.data.length - 1].voteagainsthistory
-          );
+          setCurrentProposal(reversedData[0]);
+          setCurrentTitle(reversedData[0].proposaltitle);
+          setCurrentDescription(reversedData[0].proposaldescription);
+          setVoteFor(reversedData[0].votefornum);
+          setVoteAgainst(reversedData[0].voteagainstnum);
+          setCurrentVoteForHistory(reversedData[0].voteforhistory);
+          setCurrentVoteAgainstHistory(reversedData[0].voteagainsthistory);
         }
       }
     } catch (error) {
@@ -353,8 +355,9 @@ function App(): ReactElement {
         senderAddress
       });
       setHasFetchedReadOnly(true);
-      console.log('Bootstrap Button clicked');
+      console.log('Get Proposal Data Button clicked');
       console.log(cvToValue(result));
+      setOnChainGetProposalData(cvToValue(result));
       // console.log(result);
     } catch (error) {
       console.error('Error fetching read-only function:', error);
@@ -556,6 +559,14 @@ function App(): ReactElement {
             >
               Get Proposal Data (On-Chain)
             </button>
+            {onChainGetProposalData ? (
+              <div>
+                <p>{onChainGetProposalData.type}</p>
+                <p className="mt-4">
+                  More info can be found in Chrome console.
+                </p>
+              </div>
+            ) : null}
           </div>
         ) : null}
       </div>

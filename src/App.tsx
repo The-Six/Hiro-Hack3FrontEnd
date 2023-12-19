@@ -338,7 +338,7 @@ function App(): ReactElement {
         senderAddress
       });
       setHasFetchedReadOnly(true);
-      console.log('Get Proposal Data Button clicked');
+      console.log('Success!');
       console.log(cvToValue(result));
       setOnChainGetProposalData(cvToValue(result));
       // console.log(result);

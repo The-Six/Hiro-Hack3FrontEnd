@@ -538,6 +538,7 @@ function App(): ReactElement {
                 >
                   Refresh All Proposal History
                 </button> */}
+                <hr className="mt-8 mb-2" />
                 <div className="flex items-center justify-center">
                   <h1 className="text-lg mt-4">Proposal History</h1>
                 </div>

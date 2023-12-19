@@ -42,6 +42,7 @@ function App(): ReactElement {
   const [currentVoteAgainstHistory, setCurrentVoteAgainstHistory] = useState(
     []
   );
+  const [concludeText, setConcludeText] = useState('');
 
   // Initialize your app configuration and user session here
   const appConfig = new AppConfig(['store_write', 'publish_data']);
@@ -192,6 +193,9 @@ function App(): ReactElement {
       // Refresh the proposal history
       getAllProposalData();
 
+      // Clear the conclude text
+      setConcludeText('');
+
       // Now you can enable the voteFor and voteAgainst inputs
     } catch (error) {
       console.error('Error creating proposal:', error);
@@ -231,20 +235,62 @@ function App(): ReactElement {
     }
   };
 
-  const handleConcludeProposal = async () => {
+  const handleUpdateVoteAgainst = async () => {
+    // Similar to handleCreateProposal, update the proposal with voteFor and voteAgainst
+    // Use the current proposal data and update the voteForNum and voteAgainstNum fields
+    // Update state accordingly
+
     try {
-      setIsLoading(true);
-      // Fetch all proposals
       const response = await fetch(
-        'https://hirohack3marcoijazcodetech.loca.lt/api/events'
+        'https://hirohack3marcoijazcodetech.loca.lt/api/voteAgainst',
+        {
+          method: 'POST', // or 'PATCH' depending on your API
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            title: currentTitle,
+            description: currentDescription,
+            updatedNumVoteAgainst: voteAgainst + 1,
+            updatedVoteAgainstHistory: [...currentVoteAgainstHistory, address]
+          })
+        }
       );
+
       const data = await response.json();
-      // Update state with the list of proposals, including the newly created one
-      setProposals(data);
+      // Update state or handle response data as needed
+      console.log('Votes updated:', data);
+      setVoteAgainst(voteAgainst + 1);
+      setCurrentVoteAgainstHistory([...currentVoteAgainstHistory, address]);
+      console.log('Array: ' + [...currentVoteAgainstHistory, address]);
     } catch (error) {
-      console.error('Error fetching proposals:', error);
-    } finally {
-      setIsLoading(false);
+      console.error('Error updating votes:', error);
+    }
+  };
+
+  const handleConcludeProposal = async () => {
+    // try {
+    //   setIsLoading(true);
+    //   // Fetch all proposals
+    //   const response = await fetch(
+    //     'https://hirohack3marcoijazcodetech.loca.lt/api/events'
+    //   );
+    //   const data = await response.json();
+    //   // Update state with the list of proposals, including the newly created one
+    //   setProposals(data);
+    // } catch (error) {
+    //   console.error('Error fetching proposals:', error);
+    // } finally {
+    //   setIsLoading(false);
+    // }
+    if (voteFor > voteAgainst) {
+      setConcludeText(
+        'The number of vote-for is greater than vote-against, hence the proposal can be granted and 3000 membership tokens can be assigned to the proposal.'
+      );
+    } else {
+      setConcludeText(
+        'The number of vote-for is not enough for the proposal to have the grants.'
+      );
     }
   };
 
@@ -444,7 +490,16 @@ function App(): ReactElement {
                   className="mt-2 px-2 border bg-yellow-200 hover:bg-violet-600 hover:text-white"
                   onClick={handleUpdateVoteFor}
                 >
-                  Submit Votes
+                  Submit Vote-For
+                </button>
+              </div>
+              <p>The Vote-Against Number: {voteAgainst}</p>
+              <div>
+                <button
+                  className="mt-2 px-2 border bg-yellow-200 hover:bg-violet-600 hover:text-white"
+                  onClick={handleUpdateVoteAgainst}
+                >
+                  Submit Vote-Against
                 </button>
               </div>
               <div>
@@ -455,6 +510,9 @@ function App(): ReactElement {
                 >
                   Conclude Proposal
                 </button>
+              </div>
+              <div>
+                <p>{concludeText}</p>
               </div>
               <button
                 className="mt-4 px-2 border bg-yellow-200 hover:bg-violet-600 hover:text-white"

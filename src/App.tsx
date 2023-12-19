@@ -20,7 +20,6 @@ import { verifyMessageSignatureRsv } from '@stacks/encryption';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-// import ProposalComponent from './components/ui/test';
 import { ExternalLink } from './external-link';
 import { ArrowRight } from 'lucide-react';
 import { truncateAddress } from './lib/utils';
@@ -205,14 +204,13 @@ function App(): ReactElement {
 
   const handleUpdateVoteFor = async () => {
     // Similar to handleCreateProposal, update the proposal with voteFor and voteAgainst
-    // Use the current proposal data and update the voteForNum and voteAgainstNum fields
     // Update state accordingly
 
     try {
       const response = await fetch(
         'https://hirohack3marcoijazcodetech.loca.lt/api/voteFor',
         {
-          method: 'POST', // or 'PATCH' depending on your API
+          method: 'POST',
           headers: {
             'Content-Type': 'application/json'
           },
@@ -241,14 +239,13 @@ function App(): ReactElement {
 
   const handleUpdateVoteAgainst = async () => {
     // Similar to handleCreateProposal, update the proposal with voteFor and voteAgainst
-    // Use the current proposal data and update the voteForNum and voteAgainstNum fields
     // Update state accordingly
 
     try {
       const response = await fetch(
         'https://hirohack3marcoijazcodetech.loca.lt/api/voteAgainst',
         {
-          method: 'POST', // or 'PATCH' depending on your API
+          method: 'POST',
           headers: {
             'Content-Type': 'application/json'
           },
@@ -276,20 +273,6 @@ function App(): ReactElement {
   };
 
   const handleConcludeProposal = async () => {
-    // try {
-    //   setIsLoading(true);
-    //   // Fetch all proposals
-    //   const response = await fetch(
-    //     'https://hirohack3marcoijazcodetech.loca.lt/api/events'
-    //   );
-    //   const data = await response.json();
-    //   // Update state with the list of proposals, including the newly created one
-    //   setProposals(data);
-    // } catch (error) {
-    //   console.error('Error fetching proposals:', error);
-    // } finally {
-    //   setIsLoading(false);
-    // }
     if (voteFor > voteAgainst) {
       setConcludeText(
         'The number of vote-for is greater than the vote-against, hence the proposal can be granted and 3000 membership tokens can be assigned to the proposal.'
@@ -456,7 +439,6 @@ function App(): ReactElement {
           </div>
           {userSession.isUserSignedIn() ? (
             <div className="mt-4 mb-4 rounded-lg border bg-stone-700 p-8 text-white">
-              {/* <ProposalComponent /> */}
               <div>
                 <h1 className="text-xl underline text-center">
                   Custom Blockchain API Front-End

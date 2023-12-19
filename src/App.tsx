@@ -365,210 +365,228 @@ function App(): ReactElement {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen">
-      <div className="mx-auto max-w-2xl px-4">
-        <div className="flex items-center justify-center">
-          <img
-            className="mb-4 mt-4 rounded-lg"
-            src="../assets/marcoijazcodetech-coloured.png"
-            alt="logo"
-            width="150px"
-          />
-        </div>
-        <div className="rounded-lg border bg-amber-400 p-8">
-          <h1 className="mb-2 text-lg font-semibold">Welcome to Hiro Hacks!</h1>
-          <p className="leading-normal text-muted-foreground">
-            This is an open source starter template built with{' '}
-            <ExternalLink href="https://docs.hiro.so/stacks.js/overview">
-              Stacks.js
-            </ExternalLink>{' '}
-            and a few integrations to help kickstart your app:
-          </p>
-
-          <div className="mt-4 flex flex-col items-start space-y-2">
-            {userSession.isUserSignedIn() ? (
-              <div className="flex justify-between w-full">
-                <Button
-                  onClick={disconnectWallet}
-                  variant="link"
-                  className="h-auto p-0 text-base"
-                >
-                  1. Disconnect wallet
-                  <ArrowRight size={15} className="ml-1" />
-                </Button>
-                {address && <span>{truncateAddress(address)}</span>}
-              </div>
-            ) : (
-              <Button
-                onClick={connectWallet}
-                variant="link"
-                className="h-auto p-0 text-base"
-              >
-                1. Connect your wallet
-                <ArrowRight size={15} className="ml-1" />
-              </Button>
-            )}
-            <div className="flex justify-between w-full">
-              <Button
-                onClick={signMessage}
-                variant="link"
-                className="h-auto p-0 text-base text-neutral-500"
-              >
-                2. Sign a message
-                <ArrowRight size={15} className="ml-1" />
-              </Button>
-              {isSignatureVerified && <span>{message}</span>}
-            </div>
-
-            {userSession.isUserSignedIn() ? (
-              <div className="flex justify-between w-full">
-                <Button
-                  onClick={() => fetchReadOnly(address)}
-                  variant="link"
-                  className="h-auto p-0 text-base"
-                >
-                  3. Read from a smart contract
-                  <ArrowRight size={15} className="ml-1" />
-                </Button>
-                {hasFetchedReadOnly && (
-                  <span>
-                    <Badge className="text-orange-500 bg-orange-100">
-                      Success
-                    </Badge>
-                  </span>
-                )}
-              </div>
-            ) : (
-              <div className="flex justify-between w-full">
-                <Button
-                  variant="link"
-                  className="disabled h-auto p-0 text-base"
-                >
-                  3. Read from a smart contract
-                  <ArrowRight size={15} className="ml-1" />
-                </Button>
-              </div>
-            )}
+    <div className="mt-4 mb-4 rounded bg-amber-400">
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="mx-auto max-w-2xl px-4">
+          <div className="flex items-center justify-center">
+            <img
+              className="mb-4 mt-4 rounded-lg"
+              src="../assets/marcoijazcodetech-coloured.png"
+              alt="logo"
+              width="150px"
+            />
           </div>
-        </div>
-        {userSession.isUserSignedIn() ? (
-          <div className="mt-4 rounded-lg border bg-amber-400 p-8">
-            {/* <ProposalComponent /> */}
-            <div>
-              <h1 className="text-xl underline text-center">
-                Custom Blockchain API Front-End
-              </h1>
-              <div className="mt-6">
-                <label>Title:</label>
-                <br />
-                <input
-                  type="text"
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                />
-              </div>
-              <div>
-                <label>Description:</label>
-                <br />
-                <input
-                  type="text"
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                />
-              </div>
-              <div>
-                <button
-                  className="mt-2 px-2 border bg-yellow-200 hover:bg-violet-600 hover:text-white"
-                  onClick={handleCreateProposal}
-                >
-                  Submit Proposal
-                </button>
-              </div>
-              <div className="mt-1">
-                {/* Display and enable voteFor and voteAgainst inputs here */}
-              </div>
-              <p>The current proposal selected: {currentTitle}</p>
-              <p>The Vote-For Number: {voteFor}</p>
-              <div>
-                <button
-                  className="mt-2 px-2 border bg-yellow-200 hover:bg-violet-600 hover:text-white"
-                  onClick={handleUpdateVoteFor}
-                >
-                  Submit Vote-For
-                </button>
-              </div>
-              <p>The Vote-Against Number: {voteAgainst}</p>
-              <div>
-                <button
-                  className="mt-2 px-2 border bg-yellow-200 hover:bg-violet-600 hover:text-white"
-                  onClick={handleUpdateVoteAgainst}
-                >
-                  Submit Vote-Against
-                </button>
-              </div>
-              <div>
-                <button
-                  className="mt-2 px-2 border bg-yellow-200 hover:bg-violet-600 hover:text-white"
-                  onClick={handleConcludeProposal}
-                  disabled={isLoading}
-                >
-                  Conclude Proposal
-                </button>
-              </div>
-              <div>
-                <p>{concludeText}</p>
-              </div>
-              <button
-                className="mt-4 px-2 border bg-yellow-200 hover:bg-violet-600 hover:text-white"
-                onClick={() => getAllProposalData()}
-              >
-                Refresh All Proposal History
-              </button>
-              <div>
-                <ul>
-                  {proposals.map((proposal) => (
-                    <li key={proposal.id}>
-                      <strong>Wallet ID:</strong> {proposal.walletid}
-                      <br />
-                      <strong>Title:</strong> {proposal.proposaltitle}
-                      <br />
-                      <strong>Description:</strong>{' '}
-                      {proposal.proposaldescription}
-                      <br />
-                      <strong>Vote For:</strong> {proposal.votefornum}
-                      <br />
-                      <strong>Vote Against:</strong> {proposal.voteagainstnum}
-                      <br />
-                      <strong>Vote For History:</strong>{' '}
-                      {proposal.voteforhistory.join(', ')}
-                      <br />
-                      <strong>Vote Against History:</strong>{' '}
-                      {proposal.voteagainsthistory.join(', ')}
-                      <hr />
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-            <p className="mt-4">
-              Notes: The following buttons will interact with the testnet.
+          <div className="rounded-lg border bg-stone-700 p-8 text-white">
+            <h1 className="mb-2 text-lg font-semibold">
+              Welcome to Hiro Hacks!
+            </h1>
+            <p className="leading-normal text-muted-foreground text-neutral-400">
+              This is an open source starter template built with{' '}
+              <ExternalLink href="https://docs.hiro.so/stacks.js/overview">
+                Stacks.js
+              </ExternalLink>{' '}
+              and a few integrations to help kickstart your app:
             </p>
-            <button
-              className="mt-4 px-2 border bg-yellow-200 hover:bg-violet-600 hover:text-white"
-              onClick={() => getProposalData()}
-            >
-              Get Proposal Data (On-Chain)
-            </button>
-            {onChainGetProposalData ? (
-              <div>
-                <p>Type: {onChainGetProposalData.type}</p>
-                <p className="mt-4">
-                  More info can be found in Chrome console.
-                </p>
+
+            <div className="mt-4 flex flex-col items-start space-y-2">
+              {userSession.isUserSignedIn() ? (
+                <div className="flex justify-between w-full">
+                  <Button
+                    onClick={disconnectWallet}
+                    variant="link"
+                    className="h-auto p-0 text-base text-white"
+                  >
+                    1. Disconnect wallet
+                    <ArrowRight size={15} className="ml-1" />
+                  </Button>
+                  {address && <span>{truncateAddress(address)}</span>}
+                </div>
+              ) : (
+                <Button
+                  onClick={connectWallet}
+                  variant="link"
+                  className="h-auto p-0 text-base text-white"
+                >
+                  1. Connect your wallet
+                  <ArrowRight size={15} className="ml-1" />
+                </Button>
+              )}
+              <div className="flex justify-between w-full">
+                <Button
+                  onClick={signMessage}
+                  variant="link"
+                  className="h-auto p-0 text-base text-neutral-400"
+                >
+                  2. Sign a message
+                  <ArrowRight size={15} className="ml-1" />
+                </Button>
+                {isSignatureVerified && <span>{message}</span>}
               </div>
-            ) : null}
+
+              {userSession.isUserSignedIn() ? (
+                <div className="flex justify-between w-full">
+                  <Button
+                    onClick={() => fetchReadOnly(address)}
+                    variant="link"
+                    className="h-auto p-0 text-base text-white"
+                  >
+                    3. Read from a smart contract
+                    <ArrowRight size={15} className="ml-1" />
+                  </Button>
+                  {hasFetchedReadOnly && (
+                    <span>
+                      <Badge className="text-orange-500 bg-orange-100">
+                        Success
+                      </Badge>
+                    </span>
+                  )}
+                </div>
+              ) : (
+                <div className="flex justify-between w-full">
+                  <Button
+                    variant="link"
+                    className="disabled h-auto p-0 text-base text-white"
+                  >
+                    3. Read from a smart contract
+                    <ArrowRight size={15} className="ml-1" />
+                  </Button>
+                </div>
+              )}
+            </div>
           </div>
-        ) : null}
+          {userSession.isUserSignedIn() ? (
+            <div className="mt-4 mb-4 rounded-lg border bg-stone-700 p-8 text-white">
+              {/* <ProposalComponent /> */}
+              <div>
+                <h1 className="text-xl underline text-center">
+                  Custom Blockchain API Front-End
+                </h1>
+                <div className="mt-6">
+                  <label>Title:</label>
+                  <br />
+                  <input
+                    type="text"
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
+                  />
+                </div>
+                <div>
+                  <label>Description:</label>
+                  <br />
+                  <input
+                    type="text"
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
+                  />
+                </div>
+                <div>
+                  <button
+                    className="mt-2 px-2 border bg-amber-400 text-gray-700 hover:bg-violet-600 hover:text-white"
+                    onClick={handleCreateProposal}
+                  >
+                    Submit Proposal
+                  </button>
+                </div>
+                <div className="mt-1">
+                  {/* Display and enable voteFor and voteAgainst inputs here */}
+                </div>
+                <div className="flex">
+                  <p className="flex items-center justify-center">
+                    The current proposal selected:
+                  </p>
+                  <p className="font-bold">&nbsp;{currentTitle}</p>
+                </div>
+                <div className="flex items-center justify-center border py-4">
+                  <div>
+                    <p>Vote-For Number: {voteFor}</p>
+                    <div>
+                      <button
+                        className="mt-2 px-2 border bg-amber-400 text-gray-700 hover:bg-violet-600 hover:text-white"
+                        onClick={handleUpdateVoteFor}
+                      >
+                        Submit Vote-For
+                      </button>
+                    </div>
+                  </div>
+                  <div className="ml-8">
+                    <p>Vote-Against Number: {voteAgainst}</p>
+                    <div>
+                      <button
+                        className="mt-2 px-2 border bg-amber-400 text-gray-700 hover:bg-violet-600 hover:text-white"
+                        onClick={handleUpdateVoteAgainst}
+                      >
+                        Submit Vote-Against
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                <div className="flex items-center justify-center">
+                  <button
+                    className="mt-4 px-2 border bg-red-600 text-white hover:bg-violet-600 hover:text-white"
+                    onClick={handleConcludeProposal}
+                    disabled={isLoading}
+                  >
+                    Conclude Proposal
+                  </button>
+                </div>
+                <div>
+                  <p className="mt-4">{concludeText}</p>
+                </div>
+                {/* <button
+                  className="mt-4 px-2 border bg-amber-400 text-gray-700 hover:bg-violet-600 hover:text-white"
+                  onClick={() => getAllProposalData()}
+                >
+                  Refresh All Proposal History
+                </button> */}
+                <div className="flex items-center justify-center">
+                  <h1 className="text-lg mt-4">Proposal History</h1>
+                </div>
+                <div className="mt-4">
+                  <ul>
+                    {proposals.map((proposal) => (
+                      <li key={proposal.id}>
+                        <strong>Wallet ID:</strong> {proposal.walletid}
+                        <br />
+                        <strong>Title:</strong> {proposal.proposaltitle}
+                        <br />
+                        <strong>Description:</strong>{' '}
+                        {proposal.proposaldescription}
+                        <br />
+                        <strong>Vote For:</strong> {proposal.votefornum}
+                        <br />
+                        <strong>Vote Against:</strong> {proposal.voteagainstnum}
+                        <br />
+                        <strong>Vote For History:</strong>{' '}
+                        {proposal.voteforhistory.join(', ')}
+                        <br />
+                        <strong>Vote Against History:</strong>{' '}
+                        {proposal.voteagainsthistory.join(', ')}
+                        <hr className="mt-4 mb-4" />
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+              <p className="mt-4">
+                Notes: The following button will interact with the testnet.
+              </p>
+              <button
+                className="mt-4 px-2 border bg-amber-400 text-gray-700 hover:bg-violet-600 hover:text-white"
+                onClick={() => getProposalData()}
+              >
+                Get Proposal Data (On-Chain)
+              </button>
+              {onChainGetProposalData ? (
+                <div>
+                  <p>Type: {onChainGetProposalData.type}</p>
+                  <p className="mt-4">
+                    More info can be found in the Chrome console.
+                  </p>
+                </div>
+              ) : null}
+            </div>
+          ) : null}
+        </div>
       </div>
     </div>
   );
